@@ -5,7 +5,7 @@
       flat
       bordered
       grid
-      title="User"
+      title="Addresses"
       class="my-sticky-header-table"
       :rows="rows"
       :columns="columns"
@@ -30,7 +30,9 @@
             <q-icon name="search" />
           </template>
         </q-input>
-        <q-btn color="green" @click="addUser()" class="addBtn">+</q-btn>
+        <q-btn color="green" @click="insertAddressDialog()" class="addBtn"
+          >+</q-btn
+        >
       </template>
       <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
@@ -88,7 +90,7 @@
               <q-btn
                 dense
                 flat
-                @click="editUserInfo(subprops.row)"
+                @click="editAddressDialog(subprops.row)"
                 icon="edit_square"
               ></q-btn>
             </q-card-section>
@@ -96,21 +98,102 @@
         </div>
       </template>
     </q-table>
+    <q-dialog v-model="createAddressDialog">
+      <q-card style="width: 800px">
+        <q-card-section>
+          <div class="text-h6">Neue Addresse Erstellen</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <table>
+            <tr>
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Vorname"
+                  :v-model="address.firstName"
+                  :model-value="address.firstName"
+                  @change="
+                    (value) => {
+                      address.firstName = value;
+                    }
+                  "
+                />
+              </td>
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Nachname"
+                  :v-model="address.lastName"
+                  :model-value="address.lastName"
+                  @change="
+                    (value) => {
+                      address.lastName = value;
+                    }
+                  "
+                />
+              </td>
+            </tr>
+            <br />
+            <tr>
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Geburtstag"
+                  :v-model="address.birthday"
+                  :model-value="address.birthday"
+                  type="date"
+                  @change="
+                    (value) => {
+                      address.birthday = value;
+                    }
+                  "
+                />
+              </td>
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Telefonnummer"
+                  :v-model="address.telephone"
+                  :model-value="address.telephone"
+                  type="number"
+                  @change="
+                    (value) => {
+                      address.telephone = value;
+                    }
+                  "
+                />
+              </td>
+            </tr>
+          </table>
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-white">
+          <q-btn
+            color="green"
+            label="Erstellen"
+            @click="insertAddress(this.address)"
+          />
+          <q-btn color="red" flat label="Schliessen" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import { useQuasar, QSpinnerFacebook, LoadingBar, Notify, date } from "quasar";
+import { useQuasar, QSpinnerFacebook, LoadingBar, Notify } from "quasar";
 import { webApi } from "src/composables/WebApi";
-import {
-  ref,
-  computed,
-  nextTick,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-} from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 LoadingBar.setDefaults({
   color: "purple",
@@ -160,6 +243,9 @@ export default {
     this.getAddresses();
   },
   methods: {
+    insertAddressDialog() {
+      this.createAddressDialog = true;
+    },
     getAddresses() {
       axios.get(`${webApi.server}/api/getAddresses`).then((res) => {
         (originalRows.value = res.data),
@@ -169,11 +255,49 @@ export default {
         rows.value = originalRows.value;
       });
     },
+    insertAddress(address) {
+      const addressObject = {
+        firstName: address.firstName,
+        lastName: address.lastName,
+        birthday: address.birthday,
+        telephone: address.telephone,
+      };
+
+      axios
+        .post(
+          `${webApi.server}/api/insertAddress`,
+          { address: addressObject },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          if (res.data == "ADDRESS INSERTED") {
+            Notify.create({ type: "info", message: res.data, color: "green" });
+            this.createUserDialog = false;
+            this.clearAddressDialog();
+            this.getAddresses();
+            this.tableKey += 1;
+          } else {
+            Notify.create({
+              type: "warning",
+              message: res.data,
+              color: "red",
+              textColor: "white",
+              iconColor: "white",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
     deleteAddress(id) {
       const addressObject = {
         addressID: id,
       };
-      console.log(addressObject);
       axios
         .post(
           `${webApi.server}/api/deleteAddress`,
@@ -206,6 +330,13 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+    clearAddressDialog() {
+      this.address.firstName = "";
+      this.address.lastName = "";
+      this.address.birthday = "";
+      this.address.telephone = "";
+      this.selected_row = {};
     },
   },
   setup() {
@@ -364,12 +495,14 @@ export default {
 
       tableKey,
 
-      user: ref({
+      address: ref({
         firstName: ref(""),
         lastName: ref(""),
         birthday: ref(""),
         telephone: ref(""),
       }),
+
+      createAddressDialog: ref(false),
 
       selected_row: ref({}),
 
@@ -378,3 +511,16 @@ export default {
   },
 };
 </script>
+
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(1, 1fr);
+  grid-column-gap: 40px;
+  grid-row-gap: 40px;
+}
+.addBtn {
+  left: 7px;
+}
+</style>
