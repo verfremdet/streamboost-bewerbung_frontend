@@ -1,5 +1,6 @@
 <template>
   <div class="grid">
+    <!-- ##### TABLE ###### -->
     <q-table
       ref="tableRef"
       flat
@@ -18,7 +19,9 @@
       @request="onRequest"
       wrap-cells="true"
     >
+      <!-- ##### TABLE HEADER ###### -->
       <template v-slot:top-right>
+        <!-- ## SEARCH BAR ## -->
         <q-input
           borderless
           dense
@@ -30,13 +33,16 @@
             <q-icon name="search" />
           </template>
         </q-input>
+        <!-- ## OPEN INSERT DIALOG BUTTON ## -->
         <q-btn color="green" @click="insertAddressDialog()" class="addBtn"
           >+</q-btn
         >
       </template>
+      <!-- ##### TABLE CONTENT ###### -->
       <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
           <q-card flat bordered>
+            <!-- ### -->
             <q-card-section class="flex flex-center">
               <q-icon
                 name="person"
@@ -51,6 +57,7 @@
                   position: absolute;
                 "
               />
+              <!-- ### -->
               <q-card-section
                 style="display: inline-block; padding: 30px"
                 class="text-center"
@@ -61,6 +68,7 @@
                   >{{ props.row.firstName }} {{ props.row.lastName }}</strong
                 >
               </q-card-section>
+              <!-- ### -->
               <q-card-section
                 style="display: inline-block; padding: 30px"
                 class="text-center"
@@ -69,6 +77,7 @@
                 <br />
                 <strong>{{ props.row.birthday }}</strong>
               </q-card-section>
+              <!-- ### -->
               <q-card-section
                 style="display: inline-block; padding: 30px"
                 class="text-center"
@@ -77,8 +86,11 @@
                 <br />
                 <strong>{{ props.row.telephone }}</strong>
               </q-card-section>
+              <!-- ### -->
             </q-card-section>
+            <!-- ### -->
             <q-separator />
+            <!-- ## DELETE BUTTON ## -->
             <q-card-section class="flex flex-center">
               <q-btn
                 dense
@@ -87,26 +99,42 @@
                 color="red"
                 icon="delete"
               ></q-btn>
+              <!-- ## OPEN EDIT DIALOG BUTTON ## -->
               <q-btn
                 dense
                 flat
-                @click="editAddressDialog(subprops.row)"
+                @click="editAddressDialogBtn(props.row)"
                 icon="edit_square"
               ></q-btn>
             </q-card-section>
+            <!-- ### -->
           </q-card>
         </div>
       </template>
     </q-table>
+    <!-- ########## INSERT ADDRESS DIALOG ########## -->
     <q-dialog v-model="createAddressDialog">
       <q-card style="width: 800px">
         <q-card-section>
           <div class="text-h6">Neue Addresse Erstellen</div>
+          <q-icon
+            name="person_add"
+            size="24px"
+            style="
+              border: 2px;
+              padding: 5px;
+              right: 10px;
+              top: 10px;
+              border-radius: 100px;
+              border-style: solid;
+              position: absolute;
+            "
+          />
         </q-card-section>
-
         <q-card-section class="q-pt-none">
           <table>
             <tr>
+              <!-- ## FIRST NAME ## -->
               <td>
                 <q-input
                   class="col-md-4 offset-md-4 text-white"
@@ -122,6 +150,7 @@
                   "
                 />
               </td>
+              <!-- ## LAST NAME ## -->
               <td>
                 <q-input
                   class="col-md-4 offset-md-4 text-white"
@@ -137,9 +166,11 @@
                   "
                 />
               </td>
+              <!-- ### -->
             </tr>
             <br />
             <tr>
+              <!-- ## BIRTHDAY ## -->
               <td>
                 <q-input
                   class="col-md-4 offset-md-4 text-white"
@@ -156,6 +187,7 @@
                   "
                 />
               </td>
+              <!-- ## TELEPHONE ## -->
               <td>
                 <q-input
                   class="col-md-4 offset-md-4 text-white"
@@ -164,7 +196,7 @@
                   label="Telefonnummer"
                   :v-model="address.telephone"
                   :model-value="address.telephone"
-                  type="number"
+                  type="tel"
                   @change="
                     (value) => {
                       address.telephone = value;
@@ -172,6 +204,7 @@
                   "
                 />
               </td>
+              <!-- ### -->
             </tr>
           </table>
         </q-card-section>
@@ -180,8 +213,115 @@
           <q-btn
             color="green"
             label="Erstellen"
-            @click="insertAddress(this.address)"
+            @click="insertAddress(address)"
           />
+          <q-btn color="red" flat label="Schliessen" v-close-popup />
+        </q-card-actions>
+      </q-card>
+      <!-- ########## EDIT ADDRESS DIALOG ########## -->
+    </q-dialog>
+    <q-dialog v-model="editAddressDialog">
+      <q-card style="width: 800px">
+        <q-card-section>
+          <div class="text-h6">Addresse Bearbeiten</div>
+          <q-icon
+            name="edit"
+            size="24px"
+            style="
+              border: 2px;
+              padding: 5px;
+              right: 10px;
+              top: 10px;
+              border-radius: 100px;
+              border-style: solid;
+              position: absolute;
+            "
+          />
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <table>
+            <tr>
+              <!-- ## FIRST NAME ## -->
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Vorname"
+                  :v-model="selected_row.firstName"
+                  :model-value="selected_row.firstName"
+                  @change="
+                    (value) => {
+                      selected_row.firstName = value;
+                    }
+                  "
+                />
+              </td>
+              <!-- ## LAST NAME ## -->
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Nachname"
+                  :v-model="selected_row.lastName"
+                  :model-value="selected_row.lastName"
+                  @change="
+                    (value) => {
+                      selected_row.lastName = value;
+                    }
+                  "
+                />
+              </td>
+              <!-- ### -->
+            </tr>
+            <br />
+            <tr>
+              <!-- ## BIRTHDAY ## -->
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Geburtstag"
+                  :v-model="selected_row.birthday"
+                  :model-value="selected_row.birthday"
+                  type="date"
+                  @change="
+                    (value) => {
+                      this.selected_row.birthday = value;
+                    }
+                  "
+                />
+              </td>
+              <!-- ## TELEPHONE ## -->
+              <td>
+                <q-input
+                  class="col-md-4 offset-md-4 text-white"
+                  style="width: 250px"
+                  color="green"
+                  label="Telefonnummer"
+                  :v-model="selected_row.telephone"
+                  :model-value="selected_row.telephone"
+                  type="tel"
+                  @change="
+                    (value) => {
+                      selected_row.telephone = value;
+                    }
+                  "
+                />
+              </td>
+            </tr>
+          </table>
+        </q-card-section>
+        <!-- ## SAVE EDIT ADDRESS BUTTON ## -->
+        <q-card-actions align="right" class="text-white">
+          <q-btn
+            color="green"
+            label="SPEICHERN"
+            @click="editAddress(selected_row)"
+          />
+          <!-- ## CLOSE BUTTON ## -->
           <q-btn color="red" flat label="Schliessen" v-close-popup />
         </q-card-actions>
       </q-card>
@@ -196,7 +336,7 @@ import { webApi } from "src/composables/WebApi";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
 LoadingBar.setDefaults({
-  color: "purple",
+  color: "blue",
   size: "7px",
   position: "bottom",
 });
@@ -232,7 +372,7 @@ const columns = [
     align: "center",
     field: "telephone",
   },
-  { name: "actions", label: "Aktionen", field: "", sortable: false },
+  { name: "actions", label: "Aktionen", field: "" },
 ];
 
 let originalRows = ref([]);
@@ -245,6 +385,10 @@ export default {
   methods: {
     insertAddressDialog() {
       this.createAddressDialog = true;
+    },
+    editAddressDialogBtn(locationRow) {
+      this.selected_row = locationRow;
+      this.editAddressDialog = true;
     },
     getAddresses() {
       axios.get(`${webApi.server}/api/getAddresses`).then((res) => {
@@ -276,7 +420,47 @@ export default {
         .then((res) => {
           if (res.data == "ADDRESS INSERTED") {
             Notify.create({ type: "info", message: res.data, color: "green" });
-            this.createUserDialog = false;
+            this.createAddressDialog = false;
+            this.clearAddressDialog();
+            this.getAddresses();
+            this.tableKey += 1;
+          } else {
+            Notify.create({
+              type: "warning",
+              message: res.data,
+              color: "red",
+              textColor: "white",
+              iconColor: "white",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    editAddress(address) {
+      const addressObject = {
+        id: address._id.$oid,
+        firstName: address.firstName,
+        lastName: address.lastName,
+        birthday: address.birthday,
+        telephone: address.telephone,
+      };
+
+      axios
+        .post(
+          `${webApi.server}/api/editAddress`,
+          { address: addressObject },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          if (res.data == "ADDRESS SAVED") {
+            Notify.create({ type: "info", message: res.data, color: "green" });
+            this.editAddressDialog = false;
             this.clearAddressDialog();
             this.getAddresses();
             this.tableKey += 1;
@@ -296,7 +480,7 @@ export default {
     },
     deleteAddress(id) {
       const addressObject = {
-        addressID: id,
+        id: id,
       };
       axios
         .post(
@@ -503,6 +687,7 @@ export default {
       }),
 
       createAddressDialog: ref(false),
+      editAddressDialog: ref(false),
 
       selected_row: ref({}),
 

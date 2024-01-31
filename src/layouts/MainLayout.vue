@@ -1,8 +1,22 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="background">
     <q-header elevated>
-      <q-toolbar class="shadowToolbar">
-        <q-toolbar-title class="toolbar-padding"> </q-toolbar-title>
+      <q-toolbar class="toolbar">
+        <q-toolbar-title class="toolbar-padding">
+          <q-icon
+            v-bind:name="
+              darkMode
+                ? !darkMode
+                  ? 'brightness_5'
+                  : 'brightness_5'
+                : 'dark_mode'
+            "
+            v-bind:color="darkMode ? (!darkMode ? 'white' : 'white') : 'black'"
+            size="34px"
+            style="top: -5px"
+            @click="darkModeToggle()"
+          />
+        </q-toolbar-title>
         <q-list class="links">
           <EssentialLink
             v-for="link in list"
@@ -15,9 +29,8 @@
         <q-btn
           outline
           style="color: goldenrod"
-          class="loginBtn"
+          class="logoutBtn"
           label="Logout"
-          @click="logout()"
         />
         <div class="toolbar-padding" @click="streamboost()">
           <img
@@ -36,6 +49,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+import { useQuasar, setCssVar, Dark } from "quasar";
 import EssentialLink from "components/EssentialLink.vue";
 
 const linksList = [
@@ -47,7 +61,6 @@ const linksList = [
     show: true,
   },
 ];
-const user = ref([]);
 
 export default defineComponent({
   name: "MainLayout",
@@ -58,14 +71,46 @@ export default defineComponent({
   data() {
     return {
       list: linksList,
+      darkMode: false,
+
+      whiteModeColor: "#ebebeb",
+      whiteModeTextColor: "#000",
+
+      darkModeColor: "#272727",
+      darkModeTextColor: "#fff",
     };
   },
+  mounted() {
+    this.darkMode = localStorage.getItem("darkMode");
+    console.log(localStorage.getItem("darkMode"));
+    if (this.darkMode != null && this.darkMode === "true") {
+      this.darkMode = true;
+      setCssVar("primary", this.darkModeColor);
+      setCssVar("textColor", this.darkModeTextColor);
+      Dark.set(true);
+    } else {
+      this.darkMode = false;
+      setCssVar("primary", this.whiteModeColor);
+      setCssVar("textColor", this.whiteModeTextColor);
+      Dark.set(false);
+    }
+  },
   methods: {
-    logout() {
-      window.location.replace(`${webApi.server}/logout`);
-    },
     streamboost() {
       window.location.replace("https://streamboost.de");
+    },
+    darkModeToggle() {
+      Dark.toggle();
+      this.darkMode = Dark.isActive;
+      if (this.darkMode === true) {
+        setCssVar("primary", this.darkModeColor);
+        setCssVar("textColor", this.darkModeTextColor);
+      } else {
+        setCssVar("primary", this.whiteModeColor);
+        setCssVar("textColor", this.whiteModeTextColor);
+      }
+
+      localStorage.setItem("darkMode", Dark.isActive);
     },
   },
   setup() {
@@ -79,14 +124,11 @@ export default defineComponent({
       },
     };
   },
-  unmounted() {
-    localStorage.setItem("activeUser", null);
-  },
 });
 </script>
 
 <style lang="scss" scoped>
-.loginBtn {
+.logoutBtn {
   margin-top: 9px;
   right: 20px;
 }
@@ -100,20 +142,23 @@ export default defineComponent({
   transform: translateX(-50%);
 }
 .essentialLinks {
-  color: #000;
+  color: var(--q-textColor);
   border: 5px;
-  background-color: #cecece;
+  box-shadow: 0px 0px 3px 0px #cecece;
+  background-color: var(--q-primary);
   box-shadow: 0px 0px 3px 0px #cecece;
   border-color: #cecece;
 }
 .essentialLinks:hover {
-  background-color: #c0c0c0;
-  border-color: #c0c0c0;
+  background-color: var(--q-primary);
+  border-color: var(--q-primary);
 }
-.shadowToolbar {
+.toolbar {
   box-shadow: 0 0 8px 0px rgba(0, 0, 0, 0.5);
 }
-
+.q-layout__section--marginal {
+  background-color: var(--q-primary);
+}
 .toolbar-padding {
   padding-top: 10px;
 }
