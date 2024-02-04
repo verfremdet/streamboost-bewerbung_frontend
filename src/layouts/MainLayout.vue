@@ -81,14 +81,18 @@ export default defineComponent({
     };
   },
   mounted() {
+    // This code is responsible for handling the dark mode functionality in the Vue component.
     this.darkMode = localStorage.getItem("darkMode");
     console.log(localStorage.getItem("darkMode"));
     if (this.darkMode != null && this.darkMode === "true") {
+      // The code `this.darkMode = true;` sets the `darkMode` data property of the Vue component to `true`.
       this.darkMode = true;
       setCssVar("primary", this.darkModeColor);
       setCssVar("textColor", this.darkModeTextColor);
       Dark.set(true);
     } else {
+      // The code `this.darkMode = false;` sets the `darkMode` data property of the Vue component to `false`.
+      // This means that the dark mode is not active.
       this.darkMode = false;
       setCssVar("primary", this.whiteModeColor);
       setCssVar("textColor", this.whiteModeTextColor);
@@ -96,6 +100,10 @@ export default defineComponent({
     }
   },
   methods: {
+    // The `streamboost()` method is a function that is called when a specific element in the Vue component
+    // is clicked. It redirects the user to the website "https://streamboost.de" by replacing the current
+    // window location with the new URL. Essentially, it opens the Streamboost website in the current tab
+    // or window.
     streamboost() {
       window.location.replace("https://streamboost.de");
     },

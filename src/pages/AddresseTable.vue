@@ -341,6 +341,11 @@ LoadingBar.setDefaults({
   position: "bottom",
 });
 
+// The code is defining an array called "columns" which contains objects representing columns in
+// a table. Each object represents a column and has properties such as "name" (column name), "label"
+// (column label), "align" (alignment of column content), and "field" (data field associated with the
+// column). The last object in the array represents a column for actions, but it does not have a
+// specific data field associated with it.
 const columns = [
   {
     name: "index",
@@ -380,6 +385,7 @@ let rows = ref([]);
 
 export default {
   mounted() {
+    // The code is calling the `getAddresses` method in a Vue component when opening the Site.
     this.getAddresses();
   },
   methods: {
@@ -391,6 +397,9 @@ export default {
       this.editAddressDialog = true;
     },
     getAddresses() {
+      // The code is making an HTTP GET request to the specified web API endpoint (`/api/getAddresses`)
+      // using the Axios library. It then handles the response by assigning the data received (`res.data`) to
+      // the `originalRows` variable.
       axios.get(`${webApi.server}/api/getAddresses`).then((res) => {
         (originalRows.value = res.data),
           originalRows.value.forEach((row, index) => {
@@ -407,6 +416,9 @@ export default {
         telephone: address.telephone,
       };
 
+      // The code is making a POST request to the server's `/api/insertAddress` endpoint with the
+      // `addressObject` as the request payload. It sets the `Content-Type` header to
+      // `application/json`.
       axios
         .post(
           `${webApi.server}/api/insertAddress`,
@@ -418,6 +430,12 @@ export default {
           }
         )
         .then((res) => {
+          // The code is checking if the value of `res.data` is equal
+          // to the string "ADDRESS INSERTED". If it is, it creates a notification using the
+          // `Notify.create` method with a type of "info", a message of `res.data`, and a color of
+          // "green". It then sets the `createAddressDialog` variable to false, clears the address dialog
+          // using the `clearAddressDialog` method, gets the addresses using the `getAddresses` method,
+          // and increments the `tableKey` variable by 1 for updating the Table.
           if (res.data == "ADDRESS INSERTED") {
             Notify.create({ type: "info", message: res.data, color: "green" });
             this.createAddressDialog = false;
@@ -447,6 +465,10 @@ export default {
         telephone: address.telephone,
       };
 
+      // The code is making a POST request to the server's `/api/editAddress` endpoint using the
+      // Axios library in a Vue application. It is sending an `addressObject` as the request payload in
+      // JSON format. The request also includes a `Content-Type` header set to `application/json`.
+      // This function is used when editing a address and saving it
       axios
         .post(
           `${webApi.server}/api/editAddress`,
@@ -482,6 +504,10 @@ export default {
       const addressObject = {
         id: id,
       };
+      // The code is making a POST request to a server API endpoint called "/api/deleteAddress"
+      // using the axios library. It is sending an address object as the request payload in JSON format.
+      // The request also includes a "Content-Type" header set to "application/json".
+      // The function is used when deleting an address
       axios
         .post(
           `${webApi.server}/api/deleteAddress`,
@@ -515,6 +541,9 @@ export default {
           console.log(err);
         });
     },
+    // The code is initializing the values of the properties `firstName`, `lastName`, `birthday`,
+    // `telephone` in the `address` object to empty strings. It is also initializing the `selected_row`
+    // property to an empty object.
     clearAddressDialog() {
       this.address.firstName = "";
       this.address.lastName = "";
@@ -541,6 +570,8 @@ export default {
 
     // emulate ajax call
     // SELECT * FROM ... WHERE...LIMIT...
+    // The code is a function called `fetchFromServer` that takes in parameters `startRow`, `count`,
+    // `filter`, `sortBy`, and `descending`.
     function fetchFromServer(startRow, count, filter, sortBy, descending) {
       filter = filter.toLowerCase();
       const data = filter
