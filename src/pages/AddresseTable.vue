@@ -95,7 +95,7 @@
               <q-btn
                 dense
                 flat
-                @click="deleteAddress(props.row._id.$oid)"
+                @click="deleteAddressPromt(props.row)"
                 color="red"
                 icon="delete"
               ></q-btn>
@@ -218,8 +218,8 @@
           <q-btn color="red" flat label="Schliessen" v-close-popup />
         </q-card-actions>
       </q-card>
-      <!-- ########## EDIT ADDRESS DIALOG ########## -->
     </q-dialog>
+    <!-- ########## EDIT ADDRESS DIALOG ########## -->
     <q-dialog v-model="editAddressDialog">
       <q-card style="width: 800px">
         <q-card-section>
@@ -326,6 +326,30 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- ########## DELETE ADDRESS PROMT ########## -->
+    <q-dialog v-model="sureDeleteAddressPromt">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">
+            Bist du Sicher das du die Addresse löschen möchtest?
+          </div>
+        </q-card-section>
+        <!-- ## SAVE EDIT ADDRESS BUTTON ## -->
+        <q-card-actions
+          align="center"
+          class="text-white"
+          style="padding-bottom: 20px"
+        >
+          <q-btn
+            color="green"
+            label="JA"
+            @click="deleteAddress(selected_row._id.$oid)"
+          />
+          <!-- ## CLOSE BUTTON ## -->
+          <q-btn color="red" flat label="NEIN" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -391,6 +415,10 @@ export default {
   methods: {
     insertAddressDialog() {
       this.createAddressDialog = true;
+    },
+    deleteAddressPromt(row) {
+      this.sureDeleteAddressPromt = true;
+      this.selected_row = row;
     },
     editAddressDialogBtn(locationRow) {
       this.selected_row = locationRow;
@@ -468,6 +496,7 @@ export default {
       // The code is making a POST request to the server's `/api/editAddress` endpoint using the
       // Axios library in a Vue application. It is sending an `addressObject` as the request payload in
       // JSON format. The request also includes a `Content-Type` header set to `application/json`.
+      // It then sets the `editAddressDialog` variable to false
       // This function is used when editing a address and saving it
       axios
         .post(
@@ -507,6 +536,7 @@ export default {
       // The code is making a POST request to a server API endpoint called "/api/deleteAddress"
       // using the axios library. It is sending an address object as the request payload in JSON format.
       // The request also includes a "Content-Type" header set to "application/json".
+      // It then sets the `sureDeleteAddressPromt` variable to false
       // The function is used when deleting an address
       axios
         .post(
@@ -526,6 +556,8 @@ export default {
               color: "green",
             });
             this.getAddresses();
+            this.clearAddressDialog();
+            this.sureDeleteAddressPromt = false;
             this.tableKey += 1;
           } else {
             Notify.create({
@@ -718,6 +750,7 @@ export default {
       }),
 
       createAddressDialog: ref(false),
+      sureDeleteAddressPromt: ref(false),
       editAddressDialog: ref(false),
 
       selected_row: ref({}),
