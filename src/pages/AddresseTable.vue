@@ -123,8 +123,8 @@
             style="
               border: 2px;
               padding: 5px;
-              right: 10px;
-              top: 10px;
+              right: 15px;
+              top: 15px;
               border-radius: 100px;
               border-style: solid;
               position: absolute;
@@ -230,8 +230,8 @@
             style="
               border: 2px;
               padding: 5px;
-              right: 10px;
-              top: 10px;
+              right: 15px;
+              top: 15px;
               border-radius: 100px;
               border-style: solid;
               position: absolute;
