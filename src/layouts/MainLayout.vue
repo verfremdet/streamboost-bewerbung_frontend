@@ -26,12 +26,6 @@
             class="essentialLinks"
           />
         </q-list>
-        <q-btn
-          outline
-          style="color: goldenrod"
-          class="logoutBtn"
-          label="Logout"
-        />
         <div class="toolbar-padding" @click="streamboost()">
           <img
             src="~assets/img/streamboost-bewerbung.png"
@@ -136,10 +130,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.logoutBtn {
-  margin-top: 9px;
-  right: 20px;
-}
 .wrap {
   margin-right: 820px;
 }
@@ -168,6 +158,6 @@ export default defineComponent({
   background-color: var(--q-primary);
 }
 .toolbar-padding {
-  padding-top: 10px;
+  padding-top: 3px;
 }
 </style>
